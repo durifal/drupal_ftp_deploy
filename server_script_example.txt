@@ -1,0 +1,33 @@
+## cleaning code pulled from GIT repository
+rm -rf .git
+rm .git*
+
+## remove all unecessary themes from GIT before uplodad
+# move all themes to temp directory, then copy back what is neccesary and delete temp directory
+mv web/themes/ web/themes_to_delete/
+mkdir web/themes/
+mv web/themes_to_delete/[THEME_DIRECTORY]/ web/themes/
+rm -rf web/themes_to_delete/
+
+## remove all unecessary custom modules from GIT before uplodad
+# move all custom modules to temp directory, then copy back what is neccesary and delete temp directory
+mv web/modules/custom/site_specific/ web/site_specific_to_delete/
+mkdir web/modules/custom/site_specific/
+mv web/site_specific_to_delete/[MODULE_DIRECTORY]/ web/modules/custom/site_specific/
+rm -rf web/site_specific_to_delete/
+
+## zip all code
+zip -r web.zip web/
+# prepare deploy_ftp.sh script
+cp ~/scripts/deploy_ftp.sh deploy_ftp.sh
+# copy to FTP zip with source code and drupal_deploy.php script
+./deploy_ftp.sh [FTP_HOST] [FTP_USERNAME] [FTP_PASSWORD] web.zip
+cp web/drupal_deploy.php drupal_deploy.php
+./deploy_ftp.sh [FTP_HOST] [FTP_USERNAME] [FTP_PASSWORD] drupal_deploy.php
+## run deploy script
+curl [SITE_DOMAIN]/drupal_deploy.php
+
+## prepare call_update.sh script
+cp ~/scripts/call_update.sh call_update.sh
+## call custom drupal update recursively while it return code 206
+./call_update.sh http://deploy.judo.sk/drupal_update.php
